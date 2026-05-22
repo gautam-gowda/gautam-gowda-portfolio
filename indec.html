@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gautam Gowda — VLSI & Digital Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060a08;--bg2:#0b120e;--bg3:#0f1a13;--bg4:#131f17;
+  --green:#00e87a;--green-dim:rgba(0,232,122,0.08);--green-glow:rgba(0,232,122,0.25);
+  --amber:#f0a500;--amber-dim:rgba(240,165,0,0.10);
+  --blue:#3eb8ff;--blue-dim:rgba(62,184,255,0.10);
+  --violet:#b07eff;--violet-dim:rgba(176,126,255,0.10);
+  --white:#f0f4f2;--gray:#8aaa96;--gray-dim:#3d5445;
+  --border:rgba(0,232,122,0.12);--border2:rgba(255,255,255,0.06);
+  --grid-col:rgba(0,232,122,0.03);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;font-size:16px;}
+body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--grid-col) 1px,transparent 1px),linear-gradient(90deg,var(--grid-col) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(6,10,8,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Space Mono',monospace;font-size:12px;color:var(--green);letter-spacing:.12em;display:flex;align-items:center;gap:10px;}
+.nav-logo .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
+.nav-links a{font-family:'Space Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:.18em;text-transform:uppercase;transition:color .2s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:var(--green);transform:scaleX(0);transform-origin:left;transition:transform .25s;}
+.nav-links a:hover{color:var(--white);}
+.nav-links a:hover::after{transform:scaleX(1);}
+.nav-cta{font-family:'Space Mono',monospace;font-size:10px;padding:8px 18px;border:1px solid var(--green);color:var(--green);letter-spacing:.15em;text-transform:uppercase;background:transparent;transition:all .2s;}
+.nav-cta:hover{background:var(--green);color:var(--bg);}
+/* Mobile hamburger */
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.nav-hamburger span{width:22px;height:2px;background:var(--green);transition:all .3s;}
+.nav-mobile{display:none;position:fixed;top:58px;left:0;right:0;background:rgba(6,10,8,0.98);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:199;flex-direction:column;padding:16px 0;}
+.nav-mobile.open{display:flex;}
+.nav-mobile a{font-family:'Space Mono',monospace;font-size:11px;color:var(--gray);letter-spacing:.18em;text-transform:uppercase;padding:14px 24px;border-bottom:1px solid var(--border2);transition:color .2s;}
+.nav-mobile a:hover{color:var(--green);}
+
+/* HERO */
+#hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:80px 52px 140px;overflow:hidden;z-index:1;}
+#osc-canvas{position:absolute;bottom:0;left:0;right:0;height:180px;opacity:.13;pointer-events:none;}
+#binary-rain{position:absolute;inset:0;width:100%;height:100%;opacity:.18;pointer-events:none;z-index:0;}
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:10px;color:var(--green);letter-spacing:.35em;text-transform:uppercase;margin-bottom:22px;opacity:0;animation:fadeUp .6s ease forwards .2s;position:relative;z-index:1;}
+.hero-name{font-family:'Courier Prime',monospace;font-weight:700;font-size:clamp(52px,8.5vw,106px);line-height:.92;text-align:center;color:var(--white);opacity:0;animation:fadeUp .8s ease forwards .4s;position:relative;z-index:1;}
+.hero-name em{font-style:normal;color:var(--green);text-shadow:0 0 40px var(--green-glow);}
+.hero-title{margin-top:20px;font-family:'Space Mono',monospace;font-size:clamp(10px,1.2vw,13px);color:var(--amber);letter-spacing:.3em;text-transform:uppercase;text-align:center;opacity:0;animation:fadeUp .6s ease forwards .6s;position:relative;z-index:1;}
+.hero-pitch{margin-top:36px;max-width:640px;text-align:center;font-family:'Courier Prime',monospace;font-size:clamp(15px,2vw,20px);color:var(--gray);line-height:1.75;opacity:0;animation:fadeUp .8s ease forwards .8s;position:relative;z-index:1;}
+.hero-pitch strong{color:var(--white);font-weight:400;}
+.hero-sub{margin-top:16px;font-size:12px;color:var(--gray-dim);text-align:center;letter-spacing:.05em;opacity:0;animation:fadeUp .6s ease forwards 1s;font-family:'Space Mono',monospace;position:relative;z-index:1;}
+.hero-actions{margin-top:48px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .8s ease forwards 1.1s;position:relative;z-index:1;}
+.btn-g{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:var(--green);color:var(--bg);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border:none;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);transition:all .2s;}
+.btn-g:hover{background:var(--white);box-shadow:0 0 40px var(--green-glow);}
+.btn-o{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:transparent;color:var(--white);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--border2);clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);transition:all .2s;}
+.btn-o:hover{border-color:var(--green);color:var(--green);}
+.hero-metrics{position:absolute;bottom:48px;display:flex;gap:40px;align-items:center;opacity:0;animation:fadeUp .8s ease forwards 1.4s;z-index:1;flex-wrap:wrap;justify-content:center;padding:0 24px;}
+.hm{text-align:center;}
+.hm-val{font-family:'Courier Prime',monospace;font-weight:700;font-size:36px;color:var(--green);}
+.hm-label{font-family:'Space Mono',monospace;font-size:15px;color:var(--gray-dim);letter-spacing:.2em;text-transform:uppercase;margin-top:4px;}
+.hm-sep{width:1px;height:32px;background:var(--border2);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+/* STATS BAR */
+#stats{background:var(--bg4);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.stats-inner{max-width:1140px;margin:0 auto;padding:28px 52px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.stat-item{display:flex;align-items:center;gap:14px;}
+.stat-val{font-family:'Courier Prime',monospace;font-weight:700;font-size:38px;color:var(--green);}
+.stat-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--gray-dim);letter-spacing:.18em;text-transform:uppercase;line-height:1.6;}
+.stat-sep{width:1px;height:40px;background:var(--border2);}
+
+/* SECTION SHARED */
+section{position:relative;z-index:1;}
+.s-inner{max-width:1140px;margin:0 auto;padding:100px 52px;}
+.s-head{display:flex;align-items:baseline;gap:16px;margin-bottom:64px;}
+.s-num{font-family:'Space Mono',monospace;font-size:10px;color:var(--green);letter-spacing:.25em;white-space:nowrap;}
+.s-title{font-family:'Courier Prime',monospace;font-weight:700;font-size:clamp(28px,4vw,42px);color:var(--white);}
+.s-line{flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent);}
+
+/* CURRENT FOCUS */
+#focus{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);}
+.focus-inner{max-width:1240px;margin:0 auto;padding:48px 52px;display:grid;grid-template-columns:300px 1fr;gap:60px;align-items:start;}
+.focus-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--green);letter-spacing:.3em;text-transform:uppercase;padding-top:4px;display:flex;align-items:center;gap:10px;}
+.focus-label::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.8s ease-in-out infinite;flex-shrink:0;}
+.focus-items{display:flex;flex-direction:column;}
+.focus-item{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--border2);}
+.focus-item:last-child{border-bottom:none;}
+.fi-arrow{font-family:'Space Mono',monospace;font-size:11px;color:var(--green);flex-shrink:0;}
+.fi-name{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray);font-weight:500;flex:1;}
+.fi-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:8px;padding:3px 10px;letter-spacing:.15em;text-transform:uppercase;border:1px solid;flex-shrink:0;}
+.fi-badge.active{color:var(--green);border-color:rgba(0,232,122,.3);background:var(--green-dim);}
+.fi-badge.learning{color:var(--amber);border-color:rgba(240,165,0,.3);background:var(--amber-dim);}
+.fi-badge.research{color:var(--blue);border-color:rgba(62,184,255,.3);background:var(--blue-dim);}
+.fi-badge.writing{color:var(--violet);border-color:rgba(176,126,255,.3);background:var(--violet-dim);}
+
+/* PIPELINE */
+.pipeline-wrap{background:var(--bg4);border:1px solid var(--border2);padding:20px 24px;margin:16px 0;}
+.pipeline-title{font-family:'Space Mono',monospace;font-size:8px;color:var(--gray-dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px;}
+.pipeline{display:flex;align-items:center;flex-wrap:wrap;gap:0;}
+.pipe-step{display:flex;align-items:center;gap:0;}
+.pipe-node{font-family:'Space Mono',monospace;font-size:9px;padding:6px 12px;border:1px solid;letter-spacing:.08em;white-space:nowrap;}
+.pipe-node.done{color:var(--green);border-color:rgba(0,232,122,.4);background:var(--green-dim);}
+.pipe-node.active{color:var(--amber);border-color:rgba(240,165,0,.4);background:var(--amber-dim);}
+.pipe-node.pending{color:var(--gray-dim);border-color:var(--border2);background:transparent;}
+.pipe-arrow{font-family:'Space Mono',monospace;font-size:10px;color:var(--gray-dim);padding:0 6px;}
+
+/* PROJECTS */
+#projects{background:var(--bg);border-top:1px solid var(--border);}
+.projects-list{display:flex;flex-direction:column;gap:3px;}
+.proj-card{background:var(--bg3);border:1px solid var(--border2);display:grid;grid-template-columns:300px 1fr;overflow:hidden;transition:border-color .3s,box-shadow .3s;position:relative;}
+.proj-card:hover{border-color:var(--proj-accent,var(--green));box-shadow:0 0 48px rgba(0,0,0,.5);}
+.proj-card[data-cat="vlsi"]{--proj-accent:var(--green);}
+.proj-card[data-cat="wip"]{--proj-accent:var(--amber);}
+.proj-visual{background:var(--bg4);border-right:1px solid var(--border2);display:flex;align-items:center;justify-content:center;min-height:280px;overflow:hidden;position:relative;}
+.proj-visual img{width:100%;height:100%;object-fit:cover;opacity:.85;transition:opacity .3s;}
+.proj-card:hover .proj-visual img{opacity:1;}
+.proj-visual-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:28px;}
+.wip-icon{font-family:'Courier Prime',monospace;font-size:44px;color:var(--amber);opacity:.4;}
+.wip-text{font-family:'Space Mono',monospace;font-size:9px;color:var(--gray-dim);letter-spacing:.2em;text-transform:uppercase;text-align:center;}
+.proj-content{padding:28px 32px;display:flex;flex-direction:column;gap:12px;}
+.proj-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.proj-badge{font-family:'Space Mono',monospace;font-size:8px;padding:3px 10px;letter-spacing:.15em;text-transform:uppercase;border:1px solid;}
+.proj-badge.vlsi{color:var(--green);border-color:rgba(0,232,122,.35);background:var(--green-dim);}
+.proj-badge.wip{color:var(--amber);border-color:rgba(240,165,0,.35);background:var(--amber-dim);}
+.proj-status{font-family:'Space Mono',monospace;font-size:8px;padding:3px 10px;letter-spacing:.15em;text-transform:uppercase;border:1px solid var(--border2);color:var(--gray-dim);}
+.proj-status.ongoing{color:var(--green);border-color:rgba(0,232,122,.25);}
+.proj-name{font-family:'Courier Prime',monospace;font-weight:700;font-size:19px;color:var(--white);line-height:1.25;}
+.proj-desc{font-size:13px;color:var(--gray);line-height:1.75;}
+.proj-desc strong{color:var(--white);font-weight:500;}
+.proj-kpis{display:flex;gap:20px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);}
+.proj-kpi{display:flex;flex-direction:column;gap:3px;}
+.proj-kpi-val{font-family:'Space Mono',monospace;font-size:13px;color:var(--proj-accent,var(--green));font-weight:700;}
+.proj-kpi-label{font-family:'Space Mono',monospace;font-size:8px;color:var(--gray-dim);letter-spacing:.15em;text-transform:uppercase;}
+.proj-stack{display:flex;gap:6px;flex-wrap:wrap;}
+.st-tag{font-family:'Space Mono',monospace;font-size:8px;padding:3px 9px;background:rgba(255,255,255,.04);border:1px solid var(--border2);color:var(--gray);letter-spacing:.08em;}
+.proj-bottom{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:6px;flex-wrap:wrap;}
+.proj-gh{font-family:'Space Mono',monospace;font-size:9px;color:var(--gray);letter-spacing:.12em;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;transition:all .2s;border:1px solid var(--border2);padding:7px 14px;background:transparent;}
+.proj-gh:hover{border-color:var(--proj-accent,var(--green));color:var(--proj-accent,var(--green));}
+
+/* RESEARCH */
+#research{background:var(--bg2);border-top:1px solid var(--border);}
+.research-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:3px;}
+.research-card{background:var(--bg3);border:1px solid var(--border2);padding:32px;display:flex;flex-direction:column;gap:18px;transition:border-color .3s;position:relative;overflow:hidden;}
+.research-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--rc-accent,var(--blue));opacity:.6;}
+.research-card[data-type="ml"]{--rc-accent:var(--blue);}
+.research-card[data-type="rf"]{--rc-accent:var(--amber);}
+.research-card:hover{border-color:var(--rc-accent,var(--blue));}
+.rc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.rc-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.rc-badge{font-family:'Space Mono',monospace;font-size:8px;padding:3px 10px;letter-spacing:.15em;text-transform:uppercase;border:1px solid;}
+.rc-badge.iei{color:var(--blue);border-color:rgba(62,184,255,.35);background:var(--blue-dim);}
+.rc-badge.funded{color:var(--amber);border-color:rgba(240,165,0,.35);background:var(--amber-dim);}
+.rc-badge.pub{color:var(--violet);border-color:rgba(176,126,255,.35);background:var(--violet-dim);}
+.rc-badge.sim{color:var(--green);border-color:rgba(0,232,122,.35);background:var(--green-dim);}
+.rc-grant{font-family:'Courier Prime',monospace;font-weight:700;font-size:18px;color:var(--amber);}
+.rc-title{font-family:'Courier Prime',monospace;font-weight:700;font-size:20px;color:var(--white);line-height:1.3;}
+.rc-guide{font-family:'Space Mono',monospace;font-size:9px;color:var(--gray-dim);letter-spacing:.1em;}
+.rc-guide span{color:var(--gray);}
+.rc-desc{font-size:13px;color:var(--gray);line-height:1.75;}
+.rc-desc strong{color:var(--white);font-weight:500;}
+.rc-metrics{display:flex;gap:18px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);}
+.rc-metric{display:flex;flex-direction:column;gap:3px;}
+.rc-metric-val{font-family:'Space Mono',monospace;font-size:13px;color:var(--rc-accent,var(--blue));font-weight:700;}
+.rc-metric-label{font-family:'Space Mono',monospace;font-size:8px;color:var(--gray-dim);letter-spacing:.15em;text-transform:uppercase;}
+.rc-images{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+.rc-img{width:100%;aspect-ratio:16/10;object-fit:cover;border:1px solid var(--border2);opacity:.8;transition:opacity .3s;}
+.rc-img:hover{opacity:1;}
+.rc-stack{display:flex;gap:6px;flex-wrap:wrap;}
+
+/* SKILLS */
+#skills{background:var(--bg);border-top:1px solid var(--border);}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:2px;}
+.skill-tree{background:var(--bg3);border:1px solid var(--border2);padding:24px;transition:border-color .3s;}
+.skill-tree:hover{border-color:var(--sk-accent,var(--green));}
+.sk-root{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--sk-accent,var(--green));margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.sk-root::before{content:'';width:8px;height:8px;border-radius:2px;background:var(--sk-accent,var(--green));flex-shrink:0;}
+.sk-leaf{font-family:'Space Mono',monospace;font-size:10px;color:var(--gray);padding:5px 0;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;transition:color .2s;}
+.sk-leaf:last-child{border-bottom:none;}
+.sk-leaf:hover{color:var(--white);}
+.sk-leaf::before{content:'├─';color:var(--gray-dim);font-size:9px;flex-shrink:0;}
+.sk-leaf:last-child::before{content:'└─';}
+
+/* ABOUT */
+#about{background:var(--bg2);border-top:1px solid var(--border);}
+.about-grid{display:grid;grid-template-columns:1fr 360px;gap:48px;align-items:start;}
+.about-bio-tag{font-family:'Space Mono',monospace;font-size:9px;color:var(--green);letter-spacing:.25em;text-transform:uppercase;margin-bottom:14px;}
+.about-quote{font-family:'Courier Prime',monospace;font-size:clamp(15px,2vw,19px);color:var(--white);line-height:1.75;margin-bottom:24px;border-left:2px solid var(--green);padding-left:20px;}
+.about-bio-text{font-size:14px;line-height:1.85;color:var(--gray);margin-bottom:20px;}
+.about-bio-text strong{color:var(--white);font-weight:500;}
+.about-training{margin-bottom:24px;}
+.training-title{font-family:'Space Mono',monospace;font-size:9px;color:var(--gray-dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px;}
+.training-item{font-family:'Space Mono',monospace;font-size:10px;color:var(--gray);padding:6px 0;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;}
+.training-item:last-child{border-bottom:none;}
+.training-item::before{content:'▸';color:var(--green);font-size:9px;}
+.about-links{display:flex;gap:10px;flex-wrap:wrap;}
+.about-link{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border:1px solid var(--border2);font-family:'Space Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:.12em;transition:all .2s;}
+.about-link:hover{border-color:var(--green);color:var(--green);}
+.datasheet{background:var(--bg3);border:1px solid var(--border);}
+.ds-top{background:var(--green);color:var(--bg);font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;padding:10px 20px;}
+.ds-row{display:flex;flex-direction:column;gap:4px;padding:12px 20px;border-bottom:1px solid var(--border2);}
+.ds-row:last-child{border-bottom:none;}
+.ds-key{font-family:'Space Mono',monospace;font-size:8px;color:var(--gray-dim);letter-spacing:.25em;text-transform:uppercase;}
+.ds-val{font-size:13px;color:var(--white);font-weight:500;}
+.ds-val.accent{color:var(--green);font-family:'Courier Prime',monospace;font-weight:700;font-size:17px;}
+.ds-val.amber{color:var(--amber);font-family:'Courier Prime',monospace;font-weight:700;font-size:17px;}
+.photo-slot{width:100%;aspect-ratio:1;background:var(--bg4);border:1px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:3px;}
+.photo-slot-icon{font-size:32px;opacity:.2;}
+.photo-slot-text{font-family:'Space Mono',monospace;font-size:8px;color:var(--gray-dim);letter-spacing:.15em;text-transform:uppercase;text-align:center;padding:0 16px;}
+
+/* CONTACT */
+#contact{background:var(--bg);border-top:1px solid var(--border);}
+.contact-inner{max-width:1140px;margin:0 auto;padding:100px 52px;}
+.contact-top{text-align:center;margin-bottom:56px;}
+.contact-headline{font-family:'Courier Prime',monospace;font-weight:700;font-size:clamp(30px,5vw,54px);color:var(--white);margin-bottom:16px;}
+.contact-headline em{font-style:normal;color:var(--green);}
+.contact-sub{font-size:14px;color:var(--gray);max-width:480px;margin:0 auto;line-height:1.7;}
+.contact-links{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;}
+.contact-link{display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 32px;background:var(--bg3);border:1px solid var(--border2);min-width:150px;transition:all .25s;}
+.contact-link:hover{border-color:var(--green);background:var(--green-dim);}
+.cl-icon{font-size:18px;}
+.cl-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--gray-dim);letter-spacing:.2em;text-transform:uppercase;}
+.cl-val{font-family:'Space Mono',monospace;font-size:9px;color:var(--gray);transition:color .2s;text-align:center;}
+.contact-link:hover .cl-val{color:var(--green);}
+.contact-resume{text-align:center;}
+.resume-btn{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;background:var(--green);color:var(--bg);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;border:none;transition:all .2s;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);}
+.resume-btn:hover{background:var(--white);box-shadow:0 0 48px var(--green-glow);}
+footer{text-align:center;padding:32px 52px;border-top:1px solid var(--border2);font-family:'Space Mono',monospace;font-size:9px;color:var(--gray-dim);letter-spacing:.15em;}
+
+/* MODAL */
+.proj-modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(6,10,8,.96);backdrop-filter:blur(8px);display:flex;align-items:flex-start;justify-content:center;padding:60px 20px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .3s;}
+.proj-modal-overlay.open{opacity:1;pointer-events:all;}
+.proj-modal{width:100%;max-width:860px;background:var(--bg3);border:1px solid var(--border);position:relative;}
+.modal-close{position:absolute;top:20px;right:20px;width:32px;height:32px;background:transparent;border:1px solid var(--border2);color:var(--gray);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:10;}
+.modal-close:hover{border-color:var(--green);color:var(--white);}
+.modal-header{padding:32px 36px 24px;border-bottom:1px solid var(--border2);}
+.modal-eyebrow{font-family:'Space Mono',monospace;font-size:9px;color:var(--green);letter-spacing:.25em;text-transform:uppercase;margin-bottom:12px;}
+.modal-title{font-family:'Courier Prime',monospace;font-weight:700;font-size:24px;color:var(--white);margin-bottom:16px;}
+.modal-body{padding:32px 36px;display:flex;flex-direction:column;gap:24px;}
+.modal-section-title{font-family:'Space Mono',monospace;font-size:9px;color:var(--green);letter-spacing:.25em;text-transform:uppercase;margin-bottom:10px;}
+.modal-text{font-size:14px;line-height:1.8;color:var(--gray);}
+.modal-text strong{color:var(--white);font-weight:500;}
+.modal-img{width:100%;border:1px solid var(--border2);}
+.modal-stack{display:flex;gap:6px;flex-wrap:wrap;}
+.modal-learnings{display:flex;flex-direction:column;gap:8px;}
+.ml-item{font-size:13px;color:var(--gray);line-height:1.6;padding-left:20px;position:relative;}
+.ml-item::before{content:'→';position:absolute;left:0;color:var(--green);font-family:'Space Mono',monospace;font-size:11px;}
+
+/* ═══ RESPONSIVE — MOBILE FIRST ═══ */
+@media(max-width:900px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .nav-cta{display:none;}
+  .nav-hamburger{display:flex;}
+  #hero{padding:80px 20px 160px;}
+  .hero-metrics{gap:16px;bottom:36px;}
+  .hm-sep{display:none;}
+  .hm-val{font-size:20px;}
+  .hm-label{font-size:7px;}
+  .s-inner{padding:64px 20px;}
+  .s-head{margin-bottom:40px;}
+  .focus-inner{padding:32px 20px;grid-template-columns:1fr;gap:20px;}
+  .focus-label{font-size:9px;}
+  .fi-name{font-size:12px;}
+  .fi-badge{font-size:7px;padding:2px 8px;}
+  .proj-card{grid-template-columns:1fr;}
+  .proj-visual{min-height:180px;border-right:none;border-bottom:1px solid var(--border2);}
+  .proj-content{padding:20px;}
+  .proj-name{font-size:17px;}
+  .proj-desc{font-size:12px;}
+  .research-grid{grid-template-columns:1fr;}
+  .research-card{padding:24px;}
+  .rc-title{font-size:17px;}
+  .rc-images{grid-template-columns:repeat(2,1fr);}
+  .about-grid{grid-template-columns:1fr;}
+  .skills-grid{grid-template-columns:repeat(2,1fr);}
+  .contact-inner{padding:64px 20px;}
+  .contact-link{padding:16px 20px;min-width:120px;}
+  .contact-links{gap:3px;}
+  .stats-inner{padding:20px;gap:16px;justify-content:center;}
+  .stat-sep{display:none;}
+  .pipeline{gap:4px;}
+  .pipe-node{font-size:8px;padding:4px 8px;}
+  .pipeline-wrap{padding:14px 16px;}
+}
+@media(max-width:480px){
+  .hero-name{font-size:clamp(40px,14vw,60px);}
+  .hero-pitch{font-size:14px;}
+  .hero-actions{flex-direction:column;align-items:center;}
+  .btn-g,.btn-o{width:100%;justify-content:center;}
+  .hero-metrics{gap:12px;}
+  .hm{display:none;}
+  .hm:first-child,.hm:nth-child(3){display:block;}
+  .skills-grid{grid-template-columns:1fr;}
+  .rc-images{grid-template-columns:1fr;}
+  .about-links{flex-direction:column;}
+  .about-link{justify-content:center;}
+  .contact-links{flex-direction:column;align-items:center;}
+  .contact-link{width:100%;max-width:320px;}
+  .proj-kpis{gap:12px;}
+  .modal-header{padding:24px 20px 20px;}
+  .modal-body{padding:20px;}
+  .modal-title{font-size:20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span class="pulse"></span>GG.DEV</div>
+  <ul class="nav-links">
+    <li><a href="#focus">Focus</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Hire Me</a>
+  <div class="nav-hamburger" onclick="toggleMenu()" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+<div class="nav-mobile" id="nav-mobile">
+  <a href="#focus" onclick="closeMenu()">Focus</a>
+  <a href="#projects" onclick="closeMenu()">Projects</a>
+  <a href="#research" onclick="closeMenu()">Research</a>
+  <a href="#skills" onclick="closeMenu()">Skills</a>
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#contact" onclick="closeMenu()">Contact · Hire Me</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="osc-canvas"></canvas>
+  <canvas id="binary-rain"></canvas>
+  <div class="hero-eyebrow">Electronics Engineer · VLSI & Digital Design</div>
+  <h1 class="hero-name">Gautam<br><em>Gowda</em></h1>
+  <div class="hero-title">RTL · Digital Logic · Research · Systems</div>
+  <p class="hero-pitch">
+    <strong>Sand becomes silicon.</strong> Silicon becomes logic.<br>
+    Logic becomes the brain that runs everything around us.<br>
+    I want to be part of the community that <strong>designs that brain.</strong>
+  </p>
+  <p class="hero-sub">3rd Year ECE · Dayananda Sagar College of Engineering, Bengaluru · IEI Researcher</p>
+  <div class="hero-actions">
+    <a href="#projects" class="btn-g">↓ View My Work</a>
+    <a href="https://drive.google.com/file/d/1diY9HnxI-Jk8jG5bsDjrhBTkeC5fPTR6/view?usp=sharing" target="_blank" class="btn-o">↗ Download Resume</a>
+  </div>
+  <div class="hero-metrics">
+    <div class="hm"><div class="hm-val">₹3K</div><div class="hm-label">IEI Research Grant</div></div>
+    <div class="hm-sep"></div>
+    <div class="hm"><div class="hm-val">2</div><div class="hm-label">IEEE Papers In Progress</div></div>
+    <div class="hm-sep"></div>
+    <div class="hm"><div class="hm-val">HDL</div><div class="hm-label">Verilog · RTL Design</div></div>
+    <div class="hm-sep"></div>
+    <div class="hm"><div class="hm-val">3rd</div><div class="hm-label">Year B.E. ECE</div></div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<section id="stats">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-val">5</div>
+      <div class="stat-label">Projects<br>Completed</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val">1</div>
+      <div class="stat-label">Research<br>Projects</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val">2</div>
+      <div class="stat-label">IEEE Papers<br>In Progress</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val">₹3K</div>
+      <div class="stat-label">Research<br>Grant</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val">Verilog</div>
+      <div class="stat-label">Primary<br>HDL</div>
+    </div>
+  </div>
+</section>
+
+<!-- CURRENT FOCUS -->
+<section id="focus">
+  <div class="focus-inner">
+    <div class="focus-label">Currently Active</div>
+    <div class="focus-items">
+      <div class="focus-item">
+        <span class="fi-arrow">→</span>
+        <span class="fi-name">RTL Design — Low Power ALU with Clock Gating</span>
+        <span class="fi-badge active">Active</span>
+      </div>
+      <div class="focus-item">
+        <span class="fi-arrow">→</span>
+        <span class="fi-name">Cadence Virtuoso — EDA Tool Mastery</span>
+        <span class="fi-badge learning">Starting June</span>
+      </div>
+      <div class="focus-item">
+        <span class="fi-arrow">→</span>
+        <span class="fi-name">Landslide Susceptibility — IEEE Paper Writing Phase</span>
+        <span class="fi-badge writing">Writing</span>
+      </div>
+      <div class="focus-item">
+        <span class="fi-arrow">→</span>
+        <span class="fi-name">2.4 GHz RF Harvesting System — OpenEMS + Qucs · IEEE Paper</span>
+        <span class="fi-badge research">Simulation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="s-inner">
+    <div class="s-head">
+      <span class="s-num">02 ——</span>
+      <h2 class="s-title">Projects</h2>
+      <div class="s-line"></div>
+    </div>
+    <div class="projects-list">
+
+      <!-- FSM -->
+      <div class="proj-card" data-cat="vlsi" onclick="openModal('fsm')">
+        <div class="proj-visual">
+          <img src="xxx" alt="GTKWave Simulation — Moore FSM"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="proj-visual-placeholder" style="display:none;">
+            <svg width="200" height="90" viewBox="0 0 200 90">
+              <text x="4" y="12" fill="#3d5445" font-family="monospace" font-size="7">clk</text>
+              <line x1="20" y1="10" x2="35" y2="10" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="35" y1="10" x2="35" y2="4" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="35" y1="4" x2="50" y2="4" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="50" y1="4" x2="50" y2="10" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="50" y1="10" x2="65" y2="10" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="65" y1="10" x2="65" y2="4" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="65" y1="4" x2="80" y2="4" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="80" y1="4" x2="80" y2="10" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="80" y1="10" x2="200" y2="10" stroke="#00e87a" stroke-width="1.5"/>
+              <text x="4" y="28" fill="#3d5445" font-family="monospace" font-size="7">a_grn</text>
+              <line x1="20" y1="26" x2="85" y2="26" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="85" y1="26" x2="85" y2="20" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="85" y1="20" x2="130" y2="20" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="130" y1="20" x2="130" y2="26" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="130" y1="26" x2="160" y2="26" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="160" y1="26" x2="160" y2="20" stroke="#00e87a" stroke-width="1.5"/>
+              <line x1="160" y1="20" x2="200" y2="20" stroke="#00e87a" stroke-width="1.5"/>
+              <text x="4" y="44" fill="#3d5445" font-family="monospace" font-size="7">a_yel</text>
+              <line x1="20" y1="42" x2="85" y2="42" stroke="#f0a500" stroke-width="1.5"/>
+              <line x1="85" y1="42" x2="85" y2="36" stroke="#f0a500" stroke-width="1.5"/>
+              <line x1="85" y1="36" x2="105" y2="36" stroke="#f0a500" stroke-width="1.5"/>
+              <line x1="105" y1="36" x2="105" y2="42" stroke="#f0a500" stroke-width="1.5"/>
+              <line x1="105" y1="42" x2="200" y2="42" stroke="#f0a500" stroke-width="1.5"/>
+              <text x="4" y="60" fill="#3d5445" font-family="monospace" font-size="7">a_red</text>
+              <line x1="20" y1="58" x2="110" y2="58" stroke="#ff4444" stroke-width="1.5"/>
+              <line x1="110" y1="58" x2="110" y2="52" stroke="#ff4444" stroke-width="1.5"/>
+              <line x1="110" y1="52" x2="165" y2="52" stroke="#ff4444" stroke-width="1.5"/>
+              <line x1="165" y1="52" x2="165" y2="58" stroke="#ff4444" stroke-width="1.5"/>
+              <line x1="165" y1="58" x2="200" y2="58" stroke="#ff4444" stroke-width="1.5"/>
+              <text x="4" y="76" fill="#3d5445" font-family="monospace" font-size="7">st[1:0]</text>
+              <line x1="20" y1="74" x2="85" y2="74" stroke="#b07eff" stroke-width="1.5"/>
+              <line x1="85" y1="74" x2="85" y2="68" stroke="#b07eff" stroke-width="1.5"/>
+              <line x1="85" y1="68" x2="110" y2="68" stroke="#b07eff" stroke-width="1.5"/>
+              <line x1="110" y1="68" x2="110" y2="74" stroke="#b07eff" stroke-width="1.5"/>
+              <line x1="110" y1="74" x2="160" y2="74" stroke="#b07eff" stroke-width="1.5"/>
+              <line x1="160" y1="74" x2="160" y2="68" stroke="#b07eff" stroke-width="1.5"/>
+              <line x1="160" y1="68" x2="200" y2="68" stroke="#b07eff" stroke-width="1.5"/>
+              <text x="4" y="88" fill="#3d5445" font-family="monospace" font-size="6">emg_a</text>
+              <line x1="20" y1="86" x2="120" y2="86" stroke="#3d5445" stroke-width="1"/>
+              <line x1="120" y1="86" x2="120" y2="82" stroke="#3eb8ff" stroke-width="1"/>
+              <line x1="120" y1="82" x2="145" y2="82" stroke="#3eb8ff" stroke-width="1"/>
+              <line x1="145" y1="82" x2="145" y2="86" stroke="#3eb8ff" stroke-width="1"/>
+              <line x1="145" y1="86" x2="200" y2="86" stroke="#3d5445" stroke-width="1"/>
+            </svg>
+          </div>
+        </div>
+        <div class="proj-content">
+          <div class="proj-meta">
+            <span class="proj-badge vlsi">VLSI / Digital Design</span>
+            <span class="proj-status ongoing">Verified</span>
+          </div>
+          <div class="proj-name">Digital Traffic Signal Controller<br>using Moore FSM</div>
+          <div class="proj-desc">
+            A <strong>2-way traffic signal controller</strong> in Verilog using Moore FSM architecture. Deterministic timing, synchronous state transitions, and <strong>emergency vehicle override</strong> with Road A priority arbitration. Fully verified testbench covering all edge cases.
+          </div>
+
+          <!-- FSM PIPELINE -->
+          <div class="pipeline-wrap">
+            <div class="pipeline-title">// Design Pipeline</div>
+            <div class="pipeline">
+              <div class="pipe-step"><span class="pipe-node done">Specification</span><span class="pipe-arrow">→</span></div>
+              <div class="pipe-step"><span class="pipe-node done">FSM Design</span><span class="pipe-arrow">→</span></div>
+              <div class="pipe-step"><span class="pipe-node done">RTL Coding</span><span class="pipe-arrow">→</span></div>
+              <div class="pipe-step"><span class="pipe-node done">Simulation</span><span class="pipe-arrow">→</span></div>
+              <div class="pipe-step"><span class="pipe-node done">Verification</span><span class="pipe-arrow">→</span></div>
+              <div class="pipe-step"><span class="pipe-node pending">Synthesis</span></div>
+            </div>
+          </div>
+
+          <div class="proj-kpis">
+            <div class="proj-kpi"><div class="proj-kpi-val">4</div><div class="proj-kpi-label">FSM States</div></div>
+            <div class="proj-kpi"><div class="proj-kpi-val">Moore</div><div class="proj-kpi-label">Architecture</div></div>
+            <div class="proj-kpi"><div class="proj-kpi-val">100%</div><div class="proj-kpi-label">TB Coverage</div></div>
+            <div class="proj-kpi"><div class="proj-kpi-val">A > B</div><div class="proj-kpi-label">Priority Logic</div></div>
+          </div>
+          <div class="proj-stack">
+            <span class="st-tag">Verilog HDL</span>
+            <span class="st-tag">Icarus Verilog</span>
+            <span class="st-tag">GTKWave</span>
+            <span class="st-tag">FSM Design</span>
+            <span class="st-tag">Testbench</span>
+          </div>
+          <div class="proj-bottom">
+            <a href="https://github.com/gautam-gowda/traffic-controller-system" target="_blank" class="proj-gh" onclick="event.stopPropagation()">↗ GitHub Repo</a>
+            <button class="proj-gh" onclick="event.stopPropagation();openModal('fsm')">View Details →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOW POWER ALU -->
+      <div class="proj-card" data-cat="wip">
+        <div class="proj-visual">
+          <div class="proj-visual-placeholder">
+            <div class="wip-icon">⚡</div>
+            <div class="wip-text">In Active Development</div>
+            <svg width="160" height="56" viewBox="0 0 160 56" style="margin-top:8px;">
+              <rect x="20" y="8" width="48" height="36" rx="2" fill="none" stroke="#f0a500" stroke-width="1" opacity=".4"/>
+              <text x="44" y="30" fill="#f0a500" font-family="monospace" font-size="8" text-anchor="middle" opacity=".6">ALU</text>
+              <line x1="0" y1="18" x2="20" y2="18" stroke="#3d5445" stroke-width="1"/>
+              <line x1="0" y1="34" x2="20" y2="34" stroke="#3d5445" stroke-width="1"/>
+              <line x1="68" y1="26" x2="88" y2="26" stroke="#f0a500" stroke-width="1" opacity=".6"/>
+              <rect x="88" y="18" width="28" height="16" rx="2" fill="none" stroke="#3d5445" stroke-width="1" opacity=".4"/>
+              <text x="102" y="29" fill="#3d5445" font-family="monospace" font-size="7" text-anchor="middle">ICG</text>
+              <line x1="116" y1="26" x2="136" y2="26" stroke="#3d5445" stroke-width="1" opacity=".5"/>
+              <text x="0" y="52" fill="#3d5445" font-family="monospace" font-size="6">Clock gating — switching activity reduction</text>
+            </svg>
+          </div>
+        </div>
+        <div class="proj-content">
+          <div class="proj-meta">
+            <span class="proj-badge wip">Digital Design</span>
+            <span class="proj-status ongoing">In Progress</span>
+          </div>
+          <div class="proj-name">Low Power ALU<br>using Clock Gating</div>
+          <div class="proj-desc">
+            Designing a <strong>low-power ALU</strong> in Verilog using clock gating to reduce dynamic power consumption. Targets <strong>switching activity reduction</strong> by disabling clock to inactive units — a technique used in industry-grade chip design.
+          </div>
+
+          <!-- ALU PIPELINE -->
+          <div class="pipeline-wrap">
+            <div class="pipeline-title">// Design Pipeline</div>
+            <div class="pipeline">
+              <div class="pipe-step"><span class="pipe-node done">Specification</span><span class="pipe-arrow">→</span></div>
+              <div class="pipe-step"><span class="pipe-node active">RTL Coding</span><span class="pipe-arrow">→</span></div>
+              <div class="pipe-step"><span class="pipe-node pending">Simulation</span><span class="pipe-arrow">→</span></div>
+              <div class="pipe-step"><span class="pipe-node pending">Verification</span><span class="pipe-arrow">→</span></div>
+              <div class="pipe-step"><span class="pipe-node pending">Synthesis</span></div>
+            </div>
+          </div>
+
+          <div class="proj-kpis">
+            <div class="proj-kpi"><div class="proj-kpi-val">ICG</div><div class="proj-kpi-label">Gating Method</div></div>
+            <div class="proj-kpi"><div class="proj-kpi-val">↓ Pdyn</div><div class="proj-kpi-label">Power Target</div></div>
+            <div class="proj-kpi"><div class="proj-kpi-val">RTL</div><div class="proj-kpi-label">Current Phase</div></div>
+          </div>
+          <div class="proj-stack">
+            <span class="st-tag">Verilog HDL</span>
+            <span class="st-tag">Clock Gating</span>
+            <span class="st-tag">Low Power Design</span>
+            <span class="st-tag">RTL</span>
+          </div>
+          <div class="proj-bottom">
+            <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--gray-dim);">Repo coming soon</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH -->
+<section id="research">
+  <div class="s-inner">
+    <div class="s-head">
+      <span class="s-num">03 ——</span>
+      <h2 class="s-title">Research</h2>
+      <div class="s-line"></div>
+    </div>
+    <div class="research-grid">
+
+      <!-- LANDSLIDE -->
+      <div class="research-card" data-type="ml">
+        <div class="rc-top">
+          <div class="rc-badges">
+            <span class="rc-badge pub">IEEE Publication — In Progress</span>
+          </div>
+        </div>
+        <div class="rc-title">ML-Based Landslide Susceptibility Mapping — Western Ghats, Karnataka</div>
+        <div class="rc-guide">Faculty Guide: <span>Dr. Vinod Durdi, Associate Professor — DSCE</span></div>
+        <div style="border-left:2px solid var(--blue);padding-left:10px;">
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--blue);letter-spacing:.1em;margin-bottom:3px;">IEEE PAPER</div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--gray);line-height:1.7;">"A Geospatial Machine Learning Framework for Landslide Susceptibility Assessment Using Historical Inventories and Spatial Block Validation"</div>
+        </div>
+        <div class="rc-desc">
+          A <strong>machine learning-based landslide prediction system</strong> trained on a custom multi-source geospatial dataset covering Karnataka's Western Ghats. Analyzes 7 environmental parameters — rainfall, river influence, elevation, slope, aspect, TWI — to map regional susceptibility. <strong>SHAP analysis</strong> reveals river proximity and 7-day rainfall as dominant risk drivers. Ablation study confirms rain_r7 as most critical feature.
+        </div>
+        <div class="rc-metrics">
+          <div class="rc-metric"><div class="rc-metric-val">0.888</div><div class="rc-metric-label">ROC-AUC (RF)</div></div>
+          <div class="rc-metric"><div class="rc-metric-val">3</div><div class="rc-metric-label">Models Compared</div></div>
+          <div class="rc-metric"><div class="rc-metric-val">7</div><div class="rc-metric-label">Geo Parameters</div></div>
+          <div class="rc-metric"><div class="rc-metric-val">Spatial</div><div class="rc-metric-label">Block Validation</div></div>
+        </div>
+        <div class="rc-images">
+          <img class="rc-img" src="landslide_susceptibility_map.png" alt="Susceptibility Map" onerror="this.style.background='var(--bg4)';">
+          <img class="rc-img" src="shap_summary_plot.png" alt="SHAP Plot" onerror="this.style.background='var(--bg4)';">
+          <img class="rc-img" src="spatial_validation_roc_curve.png" alt="ROC Curve" onerror="this.style.background='var(--bg4)';">
+        </div>
+        <div class="rc-stack">
+          <span class="st-tag">Random Forest</span>
+          <span class="st-tag">XGBoost</span>
+          <span class="st-tag">SHAP</span>
+          <span class="st-tag">Spatial Validation</span>
+          <span class="st-tag">Scikit-learn</span>
+          <span class="st-tag">Leaflet.js</span>
+          <span class="st-tag">Ablation Study</span>
+        </div>
+        <div><a href="https://github.com/gautam-gowda/spatial-landslide-susceptibility-ml" target="_blank" class="proj-gh" style="display:inline-flex;">↗ GitHub Repo</a></div>
+      </div>
+
+      <!-- RECTENNA -->
+      <div class="research-card" data-type="rf">
+        <div class="rc-top">
+          <div class="rc-badges">
+            <span class="rc-badge funded">IEI Funded · ₹3,000</span>
+            <span class="rc-badge sim">Simulation Phase</span>
+          </div>
+          <div class="rc-grant">₹3,000</div>
+        </div>
+        <div class="rc-title">Design and Simulation of a 2.4 GHz RF Energy Harvesting System</div>
+        <div class="rc-guide">Faculty Guides: <span>Dr. Iffath Fawad · Dr. Sandeep — DSCE</span></div>
+        <div style="border-left:2px solid var(--amber);padding-left:10px;">
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--amber);letter-spacing:.1em;margin-bottom:3px;">IEEE PAPER — IN PROGRESS</div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--gray);line-height:1.7;">"Design and Electromagnetic Simulation of a 2.4 GHz Compact Planar Monopole Rectenna for Ambient RF Energy Harvesting in IoT Applications"</div>
+        </div>
+        <div class="rc-desc">
+          An <strong>IEI-funded research project</strong> designing a compact rectangular planar monopole antenna at 2.4 GHz ISM band for ambient RF energy harvesting. Integrates an <strong>impedance matching network</strong>, multi-stage Dickson voltage multiplier rectifier, and DC regulation stage targeting 1.8V/3.3V output. Simulated in OpenEMS and Qucs under −20 dBm to −10 dBm input conditions.
+        </div>
+        <div class="rc-metrics">
+          <div class="rc-metric"><div class="rc-metric-val" style="color:var(--amber);">2.4 GHz</div><div class="rc-metric-label">ISM Band</div></div>
+          <div class="rc-metric"><div class="rc-metric-val" style="color:var(--amber);">&gt;40%</div><div class="rc-metric-label">Target RF-DC Eff.</div></div>
+          <div class="rc-metric"><div class="rc-metric-val" style="color:var(--amber);">&lt;−10 dB</div><div class="rc-metric-label">Target S11</div></div>
+          <div class="rc-metric"><div class="rc-metric-val" style="color:var(--amber);">1.8/3.3V</div><div class="rc-metric-label">DC Output</div></div>
+        </div>
+        <div style="background:var(--bg4);border:1px solid var(--border2);padding:18px 20px;">
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--gray-dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px;">System Pipeline</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--amber);padding:5px 10px;border:1px solid rgba(240,165,0,.3);background:var(--amber-dim);">2.4 GHz Antenna</span>
+            <span style="color:var(--gray-dim);">→</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--gray);padding:5px 10px;border:1px solid var(--border2);">Matching Network</span>
+            <span style="color:var(--gray-dim);">→</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--gray);padding:5px 10px;border:1px solid var(--border2);">Dickson Rectifier</span>
+            <span style="color:var(--gray-dim);">→</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--green);padding:5px 10px;border:1px solid rgba(0,232,122,.3);background:var(--green-dim);">DC Output</span>
+          </div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--gray-dim);margin-top:10px;">FR4 Substrate · VSWR &lt; 2 · Input: −20 dBm to −10 dBm</div>
+        </div>
+        <div class="rc-stack">
+          <span class="st-tag">OpenEMS</span>
+          <span class="st-tag">Qucs</span>
+          <span class="st-tag">RF Simulation</span>
+          <span class="st-tag">S-Parameter Analysis</span>
+          <span class="st-tag">Impedance Matching</span>
+          <span class="st-tag">Dickson Multiplier</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="s-inner">
+    <div class="s-head">
+      <span class="s-num">04 ——</span>
+      <h2 class="s-title">Skills</h2>
+      <div class="s-line"></div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-tree" style="--sk-accent:var(--green);">
+        <div class="sk-root">Digital Design — Primary</div>
+        <div class="sk-branch">
+          <div class="sk-leaf">Verilog HDL</div>
+          <div class="sk-leaf">FSM Design</div>
+          <div class="sk-leaf">RTL Design</div>
+          <div class="sk-leaf">Clock Gating</div>
+          <div class="sk-leaf">Low Power Design</div>
+          <div class="sk-leaf">Digital Logic</div>
+        </div>
+      </div>
+      <div class="skill-tree" style="--sk-accent:var(--amber);">
+        <div class="sk-root">EDA & Simulation</div>
+        <div class="sk-branch">
+          <div class="sk-leaf">Icarus Verilog</div>
+          <div class="sk-leaf">GTKWave</div>
+          <div class="sk-leaf">OpenEMS</div>
+          <div class="sk-leaf">Qucs</div>
+          <div class="sk-leaf">Cadence Virtuoso ↗</div>
+          <div class="sk-leaf">LTSpice</div>
+        </div>
+      </div>
+      <div class="skill-tree" style="--sk-accent:var(--blue);">
+        <div class="sk-root">ML & Research</div>
+        <div class="sk-branch">
+          <div class="sk-leaf">Scikit-learn</div>
+          <div class="sk-leaf">Random Forest · XGBoost</div>
+          <div class="sk-leaf">SHAP Analysis</div>
+          <div class="sk-leaf">Spatial Validation</div>
+          <div class="sk-leaf">Ablation Study</div>
+          <div class="sk-leaf">Geospatial Analysis</div>
+        </div>
+      </div>
+      <div class="skill-tree" style="--sk-accent:var(--violet);">
+        <div class="sk-root">Embedded Systems</div>
+        <div class="sk-branch">
+          <div class="sk-leaf">STM32 · ESP32</div>
+          <div class="sk-leaf">Arduino · Raspberry Pi</div>
+          <div class="sk-leaf">QNX RTOS</div>
+          <div class="sk-leaf">CAN / LIN Concepts</div>
+          <div class="sk-leaf">Sensor Integration</div>
+        </div>
+      </div>
+      <div class="skill-tree" style="--sk-accent:var(--green);">
+        <div class="sk-root">Languages</div>
+        <div class="sk-branch">
+          <div class="sk-leaf">Verilog</div>
+          <div class="sk-leaf">Python</div>
+          <div class="sk-leaf">C++</div>
+          <div class="sk-leaf">MATLAB</div>
+          <div class="sk-leaf">SQL</div>
+        </div>
+      </div>
+      <div class="skill-tree" style="--sk-accent:var(--gray);">
+        <div class="sk-root">Tools & Platforms</div>
+        <div class="sk-branch">
+          <div class="sk-leaf">Linux · Git · GitHub</div>
+          <div class="sk-leaf">Flask · Python Backend</div>
+          <div class="sk-leaf">Leaflet.js</div>
+          <div class="sk-leaf">SFML (C++)</div>
+          <div class="sk-leaf">VS Code · Jupyter</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="s-inner">
+    <div class="s-head">
+      <span class="s-num">05 ——</span>
+      <h2 class="s-title">About</h2>
+      <div class="s-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-bio-wrap">
+        <div class="about-bio-tag">// Who I Am</div>
+        <div class="about-quote">"I'm not just studying electronics — I'm working toward designing the logic that lives inside chips. That's the goal. Everything else is the path."</div>
+        <div class="about-bio-text">
+          I'm a <strong>3rd year Electronics & Telecommunication Engineering student</strong> at Dayananda Sagar College of Engineering, Bengaluru — specializing in VLSI and Digital Design. My work spans from writing Verilog FSMs verified with GTKWave waveforms, to building ML models with SHAP interpretability for real-world disaster risk assessment.
+        </div>
+        <div class="about-bio-text">
+          I hold an <strong>IEI-funded research project (₹3,000)</strong> on 2.4 GHz RF energy harvesting — with one IEEE paper in progress on the rectenna system. Separately, I'm working on a <strong>landslide susceptibility mapping project</strong> targeting a second IEEE publication — using Random Forest with SHAP and spatial block validation across Karnataka's Western Ghats.
+        </div>
+        <div class="about-bio-text">
+          In June, I begin <strong>Cadence Virtuoso</strong> — the next step toward industry-standard VLSI design. I believe the most interesting problems live at the intersection of hardware precision and intelligent systems.
+        </div>
+        <div class="about-training">
+          <div class="training-title">// Training & Exposure</div>
+          <div class="training-item">DERBI Foundation — PCB Hands-on Training</div>
+          <div class="training-item">QNX RTOS Workshop — Real-time Embedded Systems</div>
+          <div class="training-item">IEI Student Research Programme — Series 2025-26</div>
+        </div>
+        <div class="about-links">
+          <a href="https://github.com/gautam-gowda" target="_blank" class="about-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 4C7.58 4 4 7.58 4 12c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.33c-2.22.48-2.69-1.07-2.69-1.07-.36-.92-.88-1.17-.88-1.17-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.21 1.87.86 2.33.66.07-.51.28-.86.5-1.06-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.67 7.67 0 0 1 12 8.84c.68 0 1.36.09 2 .26 1.52-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38C17.71 18.53 20 15.54 20 12c0-4.42-3.58-8-8-8z"/></svg>
+            GitHub
+          </a>
+          <a href="https://linkedin.com/in/gautam-gowda" target="_blank" class="about-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M7.75 10h-2.5v7.5h2.5V10zM6.5 9a1.25 1.25 0 1 0 0-2.5A1.25 1.25 0 0 0 6.5 9zM17.5 13.25c0-1.8-.9-3.25-2.75-3.25-1 0-1.75.5-2.25 1.25V10h-2.5v7.5h2.5v-4c0-.9.5-1.5 1.5-1.5s1.5.6 1.5 1.5v4h2.5v-4.25z"/></svg>
+            LinkedIn
+          </a>
+          <a href="mailto:gautamgowda.in@gmail.com" class="about-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            Email
+          </a>
+          <a href="https://drive.google.com/file/d/1diY9HnxI-Jk8jG5bsDjrhBTkeC5fPTR6/view" target="_blank" class="about-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Resume PDF
+          </a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div class="photo-slot">
+          <div class="photo-slot-icon">◉</div>
+          <div class="photo-slot-text">Your photo goes here<br>Replace with &lt;img&gt; tag</div>
+        </div>
+        <div class="datasheet">
+          <div class="ds-top">// DATASHEET — GG-2025</div>
+          <div class="ds-row"><div class="ds-key">Full Name</div><div class="ds-val">Gautam Gowda</div></div>
+          <div class="ds-row"><div class="ds-key">Institution</div><div class="ds-val">Dayananda Sagar College of Engineering</div></div>
+          <div class="ds-row"><div class="ds-key">Degree</div><div class="ds-val">B.E. Electronics & Telecommunication Engg.</div></div>
+          <div class="ds-row"><div class="ds-key">Year</div><div class="ds-val">3rd Year (2023 – 2027)</div></div>
+          <div class="ds-row"><div class="ds-key">CGPA</div><div class="ds-val accent">7.84 / 10</div></div>
+          <div class="ds-row"><div class="ds-key">Research Grant</div><div class="ds-val amber">₹3,000 — IEI Funded</div></div>
+          <div class="ds-row"><div class="ds-key">Location</div><div class="ds-val">Bengaluru, India</div></div>
+          <div class="ds-row"><div class="ds-key">Specialization</div><div class="ds-val">VLSI & Digital Design</div></div>
+          <div class="ds-row"><div class="ds-key">Primary HDL</div><div class="ds-val">Verilog</div></div>
+          <div class="ds-row"><div class="ds-key">Status</div><div class="ds-val accent">Open to Internships</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-top">
+      <h2 class="contact-headline">Let's <em>Build</em><br>Something Real.</h2>
+      <p class="contact-sub">Open to VLSI internships, research collaborations, and embedded systems roles. I move fast and I verify my work.</p>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:gautamgowda.in@gmail.com" class="contact-link">
+        <span class="cl-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="4" fill="#EA4335"/>
+            <path d="M20 8l-8 5-8-5V6l8 5 8-5v2z" fill="white"/>
+            <path d="M4 6h16v12H4z" fill="none" stroke="white" stroke-width="1.5"/>
+          </svg>
+        </span>
+        <span class="cl-label">Email</span>
+        <span class="cl-val">gautamgowda.in@gmail.com</span>
+      </a>
+      <a href="https://linkedin.com/in/gautam-gowda" target="_blank" class="contact-link">
+        <span class="cl-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="4" fill="#0A66C2"/>
+            <path d="M7.75 10h-2.5v7.5h2.5V10zM6.5 9a1.25 1.25 0 1 0 0-2.5A1.25 1.25 0 0 0 6.5 9zM17.5 13.25c0-1.8-.9-3.25-2.75-3.25-1 0-1.75.5-2.25 1.25V10h-2.5v7.5h2.5v-4c0-.9.5-1.5 1.5-1.5s1.5.6 1.5 1.5v4h2.5v-4.25z" fill="white"/>
+          </svg>
+        </span>
+        <span class="cl-label">LinkedIn</span>
+        <span class="cl-val">gautam-gowda</span>
+      </a>
+      <a href="https://github.com/gautam-gowda" target="_blank" class="contact-link">
+        <span class="cl-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="4" fill="#24292F"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 4C7.58 4 4 7.58 4 12c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.33c-2.22.48-2.69-1.07-2.69-1.07-.36-.92-.88-1.17-.88-1.17-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.21 1.87.86 2.33.66.07-.51.28-.86.5-1.06-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.67 7.67 0 0 1 12 8.84c.68 0 1.36.09 2 .26 1.52-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38C17.71 18.53 20 15.54 20 12c0-4.42-3.58-8-8-8z" fill="white"/>
+          </svg>
+        </span>
+        <span class="cl-label">GitHub</span>
+        <span class="cl-val">gautam-gowda</span>
+      </a>
+    </div>
+    <div class="contact-resume">
+      <a href="GAUTAM GOWDA" target="_blank" class="resume-btn">↓ Download Resume — VLSI & Core Track</a>
+      <p style="margin-top:14px;font-family:'Space Mono',monospace;font-size:9px;color:var(--gray-dim);letter-spacing:.12em;">Embedded systems resume available on request.</p>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Gautam Gowda · Built with precision · Bengaluru, India</footer>
+
+<!-- FSM MODAL -->
+<div class="proj-modal-overlay" id="modal-fsm" onclick="if(event.target===this)closeModal('fsm')">
+  <div class="proj-modal">
+    <button class="modal-close" onclick="closeModal('fsm')">✕</button>
+    <div class="modal-header">
+      <div class="modal-eyebrow">VLSI / Digital Design · Verilog · Verified</div>
+      <div class="modal-title">Digital Traffic Signal Controller using Moore FSM with Emergency Override</div>
+      <div class="modal-stack">
+        <span class="st-tag">Verilog HDL</span><span class="st-tag">Icarus Verilog</span>
+        <span class="st-tag">GTKWave</span><span class="st-tag">Moore FSM</span><span class="st-tag">Testbench</span>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="modal-section-title">Overview</div>
+        <p class="modal-text">A <strong>synchronous 2-way traffic signal controller</strong> using Moore FSM in Verilog. Enforces deterministic timing and supports real-time emergency vehicle override with priority arbitration.</p>
+      </div>
+      <div>
+        <div class="modal-section-title">GTKWave Simulation Output</div>
+        <img class="modal-img" src="gtk_wavform.png" alt="GTKWave waveform" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <div class="modal-section-title">Hand-Designed FSM State Diagram</div>
+        <img class="modal-img" src="state_transistion_diagram.png" alt="Hand-drawn FSM state diagram" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <div class="modal-section-title">State Encoding</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">
+          <div style="background:var(--bg4);padding:12px;border:1px solid var(--border2);"><div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--green);">S0 — 00</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">A: Green<br>B: Red</div></div>
+          <div style="background:var(--bg4);padding:12px;border:1px solid var(--border2);"><div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--amber);">S1 — 01</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">A: Yellow<br>B: Red</div></div>
+          <div style="background:var(--bg4);padding:12px;border:1px solid var(--border2);"><div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--green);">S2 — 10</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">A: Red<br>B: Green</div></div>
+          <div style="background:var(--bg4);padding:12px;border:1px solid var(--border2);"><div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--amber);">S3 — 11</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">A: Red<br>B: Yellow</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="modal-section-title">Key Design Decisions</div>
+        <div class="modal-learnings">
+          <div class="ml-item">Moore architecture — outputs depend only on state, not inputs. Ensures output stability.</div>
+          <div class="ml-item">Emergency override forces S0 (Road A) or S2 (Road B) from any state asynchronously.</div>
+          <div class="ml-item">Road A given priority when both emergency signals are simultaneously active.</div>
+          <div class="ml-item">Counter resets on every state transition — Green=10 cycles, Yellow=4 cycles.</div>
+          <div class="ml-item">Testbench verified: reset, normal FSM cycle, emergency A, emergency B, simultaneous override.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Mobile nav
+function toggleMenu(){
+  const m=document.getElementById('nav-mobile');
+  m.classList.toggle('open');
+}
+function closeMenu(){
+  document.getElementById('nav-mobile').classList.remove('open');
+}
+
+// Modal
+function openModal(id){document.getElementById('modal-'+id).classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById('modal-'+id).classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.proj-modal-overlay.open').forEach(m=>m.classList.remove('open'));document.body.style.overflow='';}});
+
+// Binary / hex rain
+(function(){
+  const canvas=document.getElementById('binary-rain');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const all='01101110010100011110000111001101001110'.split('').concat('0123456789ABCDEF'.split(''));
+  let cols,drops;
+  function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;cols=Math.floor(canvas.width/18);drops=Array(cols).fill(1).map(()=>Math.random()*-50);}
+  resize();
+  window.addEventListener('resize',resize);
+  function draw(){
+    const W=canvas.width,H=canvas.height;
+    ctx.fillStyle='rgba(6,10,8,0.08)';ctx.fillRect(0,0,W,H);
+    ctx.font='14px "Space Mono",monospace';
+    for(let i=0;i<drops.length;i++){
+      const ch=all[Math.floor(Math.random()*all.length)];
+      const x=i*18,y=drops[i]*18;
+      ctx.fillStyle=drops[i]>2?'#00e87a':'#00ff99';
+      ctx.fillText(ch,x,y);
+      if(y>H&&Math.random()>0.975)drops[i]=0;
+      drops[i]+=0.6+Math.random()*0.4;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Oscilloscope
+(function(){
+  const canvas=document.getElementById('osc-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let t=0;
+  function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  function draw(){
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.beginPath();ctx.strokeStyle='#00e87a';ctx.lineWidth=1.5;
+    for(let x=0;x<W;x++){const y=H/2+Math.sin((x/W)*Math.PI*6+t)*H*0.28+Math.sin((x/W)*Math.PI*2.5+t*0.7)*H*0.10;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();
+    ctx.beginPath();ctx.strokeStyle='#f0a500';ctx.lineWidth=1;
+    let prev=0;
+    for(let x=0;x<W;x++){const raw=Math.sin((x/W)*Math.PI*10+t*1.3);const y=H*0.75+(raw>0?-H*0.15:H*0.05);if(x===0){ctx.moveTo(x,y);prev=y;}else{if(Math.abs(y-prev)>5){ctx.lineTo(x,prev);ctx.lineTo(x,y);}else ctx.lineTo(x,y);prev=y;}}
+    ctx.stroke();
+    ctx.beginPath();ctx.strokeStyle='#3eb8ff';ctx.lineWidth=0.8;ctx.globalAlpha=0.5;
+    for(let x=0;x<W;x++){const y=H*0.3+Math.sin((x/W)*Math.PI*14+t*2)*H*0.07+Math.cos((x/W)*Math.PI*4+t*0.5)*H*0.04;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();ctx.globalAlpha=1;
+    t+=0.012;requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
